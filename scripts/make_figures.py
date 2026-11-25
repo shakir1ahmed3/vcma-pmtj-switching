@@ -328,8 +328,11 @@ def figS_highv_scan(quick=False):
 
     d = cached("highV_window_scan", compute)
     t_holds, mz = d["t_hold"], d["mz_final"]
-    fig, ax = plt.subplots(figsize=(6.5, 2.0), layout="constrained")
-    ax.plot(t_holds * 1e9, mz, ".", ms=2.5, color=vp.C_MX)
+    t_fine = np.arange(t_holds.min(), t_holds.max() + 1e-15, 2e-12)
+    mz_off = ex.mz_at_pulse_off(DEV, HIGHV.V0, t_fine, (HIGHV.Bx, 0, 0))
+    fig, ax = plt.subplots(figsize=(6.5, 2.4), layout="constrained")
+    ax.plot(t_fine * 1e9, mz_off, color=vp.C_MX, lw=0.6, alpha=0.3, label=r"$m_z$ when the pulse switches off")
+    ax.plot(t_holds * 1e9, mz, ".", ms=2.5, color=vp.C_MX, label=r"final $m_z$")
     ax.axhline(0, color=vp.MUTED, lw=0.6)
     for th, c in ((HIGHV.t_hold_case2, "ii"), (HIGHV.t_hold_case1, "i")):
         ax.axvline(th * 1e9, color=vp.INK2, lw=0.6, ls=":")
@@ -337,7 +340,8 @@ def figS_highv_scan(quick=False):
     ax.set_xlim(5, 30)
     ax.set_ylim(-1.15, 1.15)
     ax.set_xlabel(r"Pulse flat-top duration $t_{hold}$ (ns)")
-    ax.set_ylabel(r"final $m_z$")
+    ax.set_ylabel(r"$m_z$")
+    ax.legend(loc="lower center", ncol=2, bbox_to_anchor=(0.5, 1.12), frameon=False)
     ax.set_title(rf"High-voltage regime ($V_0$ = {HIGHV.V0:g} V, 5 mT): switching windows only 0.1–0.5 ns wide",
                  loc="left")
     vp.save(fig, FIG / "figS2_highV_switching_scan")

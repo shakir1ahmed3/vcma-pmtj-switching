@@ -129,6 +129,23 @@ def switching_vs_width(device: Device, V0: float, t_holds, bias, m0=None,
     return out
 
 
+def mz_at_pulse_off(device: Device, V0: float, t_holds, bias, m0=None,
+                    t_rise: float = 50e-12) -> np.ndarray:
+    """Instantaneous m_z at the moment the pulse starts to switch off (end of the flat top),
+    for each flat-top duration in ``t_holds``.
+
+    Until it switches off, a pulse of duration t_hold is identical to a longer pulse, so one
+    simulation with the longest flat top gives m_z(T_START + t_rise + t_hold) for all of them.
+    Plot it next to ``switching_vs_width`` to see where on the trajectory each outcome is set."""
+    t_holds = np.asarray(t_holds)
+    if m0 is None:
+        m0 = equilibrium(device, 0.0, bias, +1)
+    pulses = PulseTrain.single(V0, float(t_holds.max()), t_start=T_START, t_rise=t_rise)
+    t_off = T_START + t_rise + t_holds
+    r = simulate(device, pulses, m0, float(t_off.max()) + 1e-12, bias=bias, alpha_relax=None, store_every=10)
+    return np.interp(t_off, r.t, r.mz)
+
+
 def switching_map(device: Device, voltages, t_ons, bias, m0, t_settle: float = 8e-9) -> np.ndarray:
     """Final m_z on a (voltage, ON-time) grid for Deng-style pulses starting at t = 0
     (constant damping, no relaxation boost). Shape (len(voltages), len(t_ons))."""

@@ -201,9 +201,13 @@ for th, case in ((HV.t_hold_case1, "i"), (HV.t_hold_case2, "ii")):
     vp.plot_dynamics(r, (9, 3.6), title=f"8.5 V, case ({case})")
 fig = plt.figure(figsize=(5, 5)); vp.trajectory_3d(fig.add_subplot(projection="3d"), r)"""),
         code("""d = np.load(DATA / "highV_window_scan.npz")
+t_fine = np.arange(d["t_hold"].min(), d["t_hold"].max() + 1e-15, 2e-12)
+mz_off = ex.mz_at_pulse_off(dev, HV.V0, t_fine, (HV.Bx, 0, 0))   # m_z at the instant the pulse switches off
 fig, ax = plt.subplots(figsize=(9, 2.4), layout="constrained")
-ax.plot(d["t_hold"]*1e9, d["mz_final"], ".", ms=3)
-ax.set(xlabel="$t_{hold}$ (ns)", ylabel="final $m_z$", title="switching windows are only 0.1-0.5 ns wide");"""),
+ax.plot(t_fine*1e9, mz_off, color="C0", lw=0.6, alpha=0.3, label="$m_z$ when the pulse switches off")
+ax.plot(d["t_hold"]*1e9, d["mz_final"], ".", ms=3, color="C0", label="final $m_z$")
+ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False)
+ax.set(xlabel="$t_{hold}$ (ns)", ylabel="$m_z$", title="switching windows are only 0.1-0.5 ns wide");"""),
         md("""## 5. High field (50 mT)
 
 The field alone removes the barrier once $\\mu_0H_{K,\\mathrm{eff},xz}(V) < 50$ mT, i.e. above 2.61 V; above it $m$ orbits the $x$ axis."""),
