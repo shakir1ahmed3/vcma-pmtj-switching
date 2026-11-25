@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vcma-mtj"
+version = "1.0.0"
+description = "Macrospin LLG simulation of voltage-controlled magnetic anisotropy (VCMA) switching in an elliptical perpendicular MTJ"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Shakir Ahmed" }]
+keywords = ["spintronics", "VCMA", "MTJ", "MRAM", "LLG", "micromagnetics", "macrospin"]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
+
+[project.optional-dependencies]
+fast = ["numba>=0.58"]
+notebooks = ["jupyter", "nbclient", "ipykernel"]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

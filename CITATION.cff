@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "vcma-pmtj-switching: macrospin LLG simulation of VCMA switching in an elliptical perpendicular MTJ"
+authors:
+  - family-names: Ahmed
+    given-names: Shakir
+    affiliation: "Bangladesh University of Engineering and Technology (BUET)"
+version: 1.0.0
+date-released: 2026-11-24
+license: MIT
+repository-code: "https://github.com/shakir1ahmed3/vcma-pmtj-switching"
+keywords: [spintronics, VCMA, MTJ, MRAM, LLG, macrospin]
+references:
+  - type: article
+    title: "Ultrafast and low-energy switching in voltage-controlled elliptical pMTJ"
+    authors:
+      - family-names: Deng
+        given-names: J.
+      - family-names: Liang
+        given-names: G.
+      - family-names: Gupta
+        given-names: G.
+    journal: "Scientific Reports"
+    volume: 7
+    start: 16562
+    year: 2017
+  - type: article
+    title: "Demagnetization factors for elliptic cylinders"
+    authors:
+      - family-names: Beleggia
+        given-names: M.
+      - family-names: De Graef
+        given-names: M.
+      - family-names: Millev
+        given-names: Y. T.
+      - family-names: Goode
+        given-names: D. A.
+      - family-names: Rowlands
+        given-names: G.
+    journal: "Journal of Physics D: Applied Physics"
+    volume: 38
+    start: 3333
+    year: 2005
