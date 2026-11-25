@@ -177,10 +177,17 @@ r = ex.run_pulse(dev, NC.V0, NC.t_hold_half, (NC.Bx, 0, 0), double_gap=NC.gap)
 vp.plot_dynamics(r, (9, 3.6), title="two 1 ns pulses: +z -> -z -> +z");"""),
         md("""Switching windows: the layer switches when the pulse ends while $m$ is in the opposite hemisphere, i.e. for
 $(n+\\tfrac14)T < t < (n+\\tfrac34)T$:"""),
+        md("""Shaded: where the simulation actually switched. Dashed: the rule, using the period fitted to the windows.
+(The mean period on the single 9 ns pulse above is a little shorter, so it drifts off the windows after a few periods.)"""),
         code("""d = np.load(DATA / "nearcrit_window_scan.npz")
-print("windows (ns):", [(round(float(a)*1e9, 2), round(float(b)*1e9, 2)) for a, b in ex.windows_from_scan(d["t_hold"], d["mz_final"])])
+wins = ex.windows_from_scan(d["t_hold"], d["mz_final"])
+Tw = ex.window_period(wins)
+print("windows (ns):", [(round(float(a)*1e9, 2), round(float(b)*1e9, 2)) for a, b in wins])
+print(f"period fitted to the windows: {Tw*1e9:.2f} ns  (single-pulse mean: {T*1e9:.2f} ns)")
 fig, ax = plt.subplots(figsize=(9, 2.6), layout="constrained")
-for n in range(3): ax.axvspan((n+.25)*T*1e9, (n+.75)*T*1e9, color="#cde2fb", lw=0)
+for a, b in wins: ax.axvspan(a*1e9, b*1e9, color="#cde2fb", lw=0)
+for n in range(len(wins)):
+    for f in (.25, .75): ax.axvline((n+f)*Tw*1e9, color="0.5", ls="--", lw=0.8)
 ax.plot(d["t_hold"]*1e9, d["mz_final"], ".", ms=3)
 ax.set(xlabel="$t_{hold}$ (ns)", ylabel="final $m_z$", xlim=(0, 6));"""),
         md("""## 4. High voltage, low field (8.5 V, 5 mT)

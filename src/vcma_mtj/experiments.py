@@ -165,3 +165,18 @@ def windows_from_scan(t_holds, mz_final) -> list[tuple[float, float]]:
     if start is not None:
         out.append((start, prev))
     return out
+
+
+def window_period(windows) -> float:
+    """Effective period (s) implied by switching windows: least-squares fit of the
+    window centres to (n + 1/2) T, n = 0, 1, 2, ...
+
+    This is the period that sets the (n+1/4)T < t_hold < (n+3/4)T rule. It differs
+    slightly from ``measured_period`` on a single long pulse (pulse ramps, and the
+    precession period drifts as the cone angle changes), so use it, not that one,
+    when overlaying the rule on a t_hold scan."""
+    if not windows:
+        return float("nan")
+    c = np.array([(a + b) / 2 for a, b in windows])
+    n = np.arange(len(c)) + 0.5
+    return float(c @ n / (n @ n))

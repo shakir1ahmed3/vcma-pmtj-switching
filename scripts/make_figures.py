@@ -248,20 +248,28 @@ def figS_window(quick=False):
     d = cached("nearcrit_window_scan", compute)
     t_holds, mz = d["t_hold"], d["mz_final"]
     wins = ex.windows_from_scan(t_holds, mz)
-    T = RESULTS.get("near_critical", {}).get("period_ns", 1.95)
+    # Shade the simulated windows themselves; overlay the (n+1/4)T..(n+3/4)T rule with the
+    # period fitted to those windows. (The mean period on one 9 ns pulse, ~1.85 ns, drifts
+    # off the windows by ~0.15 ns after three periods, so it is not used here.)
+    T = ex.window_period(wins) * 1e9
     fig, ax = plt.subplots(figsize=(6.5, 2.3), layout="constrained")
-    for n in range(3):
-        ax.axvspan((n + 0.25) * T, (n + 0.75) * T, color="#cde2fb", lw=0, zorder=0,
-                   label=r"$(n+\frac{1}{4})T < t < (n+\frac{3}{4})T$" if n == 0 else None)
-    ax.plot(t_holds * 1e9, mz, ".", ms=2.5, color=vp.C_MX, label="simulated final $m_z$")
+    for i, (a, b) in enumerate(wins):
+        ax.axvspan(a * 1e9, b * 1e9, color="#cde2fb", lw=0, zorder=0,
+                   label="simulated switching window" if i == 0 else None)
+    for n in range(len(wins)):
+        for k, f in enumerate((0.25, 0.75)):
+            ax.axvline((n + f) * T, color=vp.MUTED, lw=0.8, ls="--", zorder=1,
+                       label=rf"$(n+\frac{{1}}{{4}})T$, $(n+\frac{{3}}{{4}})T$, $T$ = {T:.2f} ns"
+                       if n == 0 and k == 0 else None)
+    ax.plot(t_holds * 1e9, mz, ".", ms=2.5, color=vp.C_MX, label="simulated final $m_z$", zorder=2)
     ax.axhline(0, color=vp.MUTED, lw=0.6)
     ax.set_xlim(0, 6)
     ax.set_ylim(-1.15, 1.15)
     ax.set_xlabel(r"Pulse flat-top duration $t_{hold}$ (ns)")
     ax.set_ylabel(r"final $m_z$")
-    ax.set_title(rf"Switching windows at $V_0$ = {NEAR.V0:g} V, $\mu_0H_x$ = 5 mT "
-                 rf"(start +z; mean period during the pulse $T$ = {T:.2f} ns)", loc="left")
-    ax.legend(loc="center", ncol=2, bbox_to_anchor=(0.5, 0.5))
+    ax.set_title(rf"Switching windows at $V_0$ = {NEAR.V0:g} V, $\mu_0H_x$ = 5 mT (start +z)", loc="left")
+    ax.legend(loc="lower center", ncol=3, bbox_to_anchor=(0.5, 1.12), frameon=False)
+    RESULTS.setdefault("near_critical", {})["window_period_ns"] = T
     vp.save(fig, FIG / "figS1_nearcrit_switching_windows")
     RESULTS.setdefault("near_critical", {})["windows_ns"] = [(a * 1e9, b * 1e9) for a, b in wins]
 
